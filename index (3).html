@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M2 Semestre 3 - Calculator System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00f3ff; /* Cyan Neon */
+            --secondary-color: #bc13fe; /* Purple Neon */
+            --bg-color: #050510;
+            --panel-bg: rgba(20, 20, 35, 0.7);
+            --border-color: #2a2a40;
+            --text-color: #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        h1 span {
+            color: var(--secondary-color);
+            font-size: 0.6em;
+            display: block;
+            margin-top: 5px;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .unit-section {
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .unit-title {
+            position: absolute;
+            top: -12px;
+            right: 15px;
+            background: var(--bg-color);
+            padding: 0 10px;
+            color: var(--secondary-color);
+            font-weight: bold;
+            font-size: 0.9em;
+            border: 1px solid var(--secondary-color);
+            box-shadow: 0 0 5px var(--secondary-color);
+        }
+
+        .subject-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #333;
+        }
+
+        .subject-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .subject-name {
+            flex: 2;
+            min-width: 200px;
+            font-size: 0.95em;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .coeff-badge {
+            font-size: 0.7em;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .inputs-container {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.7em;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 2px;
+        }
+
+        input[type="number"] {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 8px;
+            width: 70px;
+            text-align: center;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            transition: 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
+        }
+
+        /* Buttons and Results */
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        button {
+            background: transparent;
+            color: var(--primary-color);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1em;
+            padding: 10px 40px;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+
+        button:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.8);
+        }
+
+        .result-panel {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 243, 255, 0.05);
+            border: 1px solid var(--secondary-color);
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .gpa-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 20px var(--secondary-color);
+            margin: 10px 0;
+        }
+
+        .status {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .pass { color: #00ff6a; text-shadow: 0 0 10px #00ff6a; }
+        .fail { color: #ff004c; text-shadow: 0 0 10px #ff004c; }
+
+        @media (max-width: 600px) {
+            .subject-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .inputs-container {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 10px;
+            }
+            input[type="number"] {
+                width: 100%;
+            }
+            .input-group {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>SEMESTER 03 <span>نظام حساب المعدلات الجامعي</span></h1>
+
+    <!-- UEF 2.1.1 -->
+    <div class="unit-section">
+        <div class="unit-title">UE Fondamentale 1</div>
+        
+        <!-- Systèmes Temps Réel: Coeff 3 (40% CC / 60% Exam) -->
+        <div class="subject-row">
+            <div class="subject-name">
+                Systèmes Temps Réel
+                <span class="coeff-badge">المعامل: 3</span>
+            </div>
+            <div class="inputs-container">
+                <div class="input-group">
+                    <label>CC (40%)</label>
+                    <input type="number" id="cc_str" min="0" max="20" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>Examen (60%)</label>
+                    <input type="number" id="ex_str" min="0" max="20" placeholder="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Vision Artificielle: Coeff 2 (40% CC / 60% Exam) -->
+        <div class="subject-row">
+            <div class="subject-name">
+                Système de Vision Artificielle
+                <span class="coeff-badge">المعامل: 2</span>
+            </div>
+            <div class="inputs-container">
+                <div class="input-group">
+                    <label>CC (40%)</label>
+                    <input type="number" id="cc_vis" min="0" max="20" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>Examen (60%)</label>
+                    <input type="number" id="ex_vis" min="0" max="20" placeholder="0">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UEF 2.1.2 -->
+    <div class="unit-section">
+        <div class="unit-title">UE Fondamentale 2</div>
+        
+        <!-- Systèmes Embarqués: Coeff 2 (40% CC / 60% Exam) -->
+        <div class="subject-row">
+            <div class="subject-name">
+                Systèmes Embarqués
+                <span class="coeff-badge">المعامل: 2</span>
+            </div>
+            <div class="inputs-container">
+                <div class="input-group">
+                    <label>CC (40%)</label>
+                    <input type="number" id="cc_emb" min="0" max="20" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>Examen (60%)</label>
+                    <input type="number" id="ex_emb" min="0" max="20" placeholder="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Réseaux Industriels: Coeff 2 (40% CC / 60% Exam) -->
+        <div class="subject-row">
+            <div class="subject-name">
+                Réseaux et comm. industriels
+                <span class="coeff-badge">المعامل: 2</span>
+            </div>
+            <div class="inputs-container">
+                <div class="input-group">
+                    <label>CC (40%)</label>
+                    <input type="number" id="cc_res" min="0" max="20" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>Examen (60%)</label>
+                    <input type="number" id="ex_res" min="0" max="20" placeholder="0">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UEM 2.1 -->
+    <div class="unit-section">
+        <div class="unit-title">UE Méthodologique</div>
+        
+        <!-- TP Vision: Coeff 1 (100% CC) -->
+        <div class="subject-row">
+            <div class="subject-name">
+                TP Vision Artificielle
+                <span class="coeff-badge">المعامل: 1 (100% TP)</span>
+            </div>
+            <div class="inputs-container">
+                <div class="input-group">
+                    <label>Note TP</label>
+                    <input type="number" id="tp_vis" min="0" max="20" placeholder="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- TP Embarqués / STR: Coeff 1 (100% CC) -->
+        <div class="subject-row">
+            <div class="subject-name">
+                TP Systèmes embarqués/TP STR
+                <span class="coeff-badge">المعامل: 1 (100% TP)</span>
+            </div>
+            <div class="inputs-container">
+                <div class="input-group">
+                    <label>Note TP</label>
+                    <input type="number" id="tp_emb" min="0" max="20" placeholder="0">
+                </div>
+            </div>
+        </div>
+
+         <!-- TP Réseaux: Coeff 1 (100% CC) -->
+         <div class="subject-row">
+            <div class="subject-name">
+                TP Réseaux industriels
+                <span class="coeff-badge">المعامل: 1 (100% TP)</span>
+            </div>
+            <div class="inputs-container">
+                <div class="input-group">
+                    <label>Note TP</label>
+                    <input type="number" id="tp_res" min="0" max="20" placeholder="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Projets: Coeff 2 (40% CC / 60% Exam) -->
+        <div class="subject-row">
+            <div class="subject-name">
+                Etude et Réalisation des projets
+                <span class="coeff-badge">المعامل: 2</span>
+            </div>
+            <div class="inputs-container">
+                <div class="input-group">
+                    <label>CC (40%)</label>
+                    <input type="number" id="cc_prj" min="0" max="20" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label>Examen (60%)</label>
+                    <input type="number" id="ex_prj" min="0" max="20" placeholder="0">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UED 2.1 (Discovery) -->
+    <div class="unit-section">
+        <div class="unit-title">UE Découverte</div>
+        
+        <!-- Matière au choix 1: Coeff 1 (100% Exam) -->
+        <div class="subject-row">
+            <div class="subject-name">
+                Matière au choix 1
+                <span class="coeff-badge">المعامل: 1 (100% Examen)</span>
+            </div>
+            <div class="inputs-container">
+                <div class="input-group">
+                    <label>Note</label>
+                    <input type="number" id="ex_op1" min="0" max="20" placeholder="0">
+                </div>
+            </div>
+        </div>
+
+         <!-- Matière au choix 2: Coeff 1 (100% Exam) -->
+         <div class="subject-row">
+            <div class="subject-name">
+                Matière au choix 2
+                <span class="coeff-badge">المعامل: 1 (100% Examen)</span>
+            </div>
+            <div class="inputs-container">
+                <div class="input-group">
+                    <label>Note</label>
+                    <input type="number" id="ex_op2" min="0" max="20" placeholder="0">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UET 2.1 (Transversal) -->
+    <div class="unit-section">
+        <div class="unit-title">UE Transversale</div>
+        
+        <!-- Recherche doc: Coeff 1 (100% Exam) -->
+        <div class="subject-row">
+            <div class="subject-name">
+                Recherche doc & mémoire
+                <span class="coeff-badge">المعامل: 1 (100% Examen)</span>
+            </div>
+            <div class="inputs-container">
+                <div class="input-group">
+                    <label>Note</label>
+                    <input type="number" id="ex_rech" min="0" max="20" placeholder="0">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="calculateGPA()">INITIALIZE CALCULATION</button>
+    </div>
+
+    <div id="result" class="result-panel">
+        <div>Moyenne Générale / المعدل الفصلي</div>
+        <div class="gpa-display" id="final_average">0.00</div>
+        <div id="status_msg" class="status"></div>
+    </div>
+
+</div>
+
+<script>
+    function getVal(id) {
+        let val = parseFloat(document.getElementById(id).value);
+        if (isNaN(val)) return 0;
+        return val;
+    }
+
+    function calculateGPA() {
+        // --- DATA COLLECTION ---
+        
+        // UEF 1
+        let str = (getVal('cc_str') * 0.4 + getVal('ex_str') * 0.6); // Coeff 3
+        let vis = (getVal('cc_vis') * 0.4 + getVal('ex_vis') * 0.6); // Coeff 2
+
+        // UEF 2
+        let emb = (getVal('cc_emb') * 0.4 + getVal('ex_emb') * 0.6); // Coeff 2
+        let res = (getVal('cc_res') * 0.4 + getVal('ex_res') * 0.6); // Coeff 2
+
+        // UEM
+        let tp_vis = getVal('tp_vis'); // Coeff 1
+        let tp_emb = getVal('tp_emb'); // Coeff 1
+        let tp_res = getVal('tp_res'); // Coeff 1
+        let projet = (getVal('cc_prj') * 0.4 + getVal('ex_prj') * 0.6); // Coeff 2
+
+        // UED
+        let op1 = getVal('ex_op1'); // Coeff 1
+        let op2 = getVal('ex_op2'); // Coeff 1
+
+        // UET
+        let rech = getVal('ex_rech'); // Coeff 1
+
+        // --- CALCULATION ---
+        let totalScore = 
+            (str * 3) + 
+            (vis * 2) + 
+            (emb * 2) + 
+            (res * 2) + 
+            (tp_vis * 1) + 
+            (tp_emb * 1) + 
+            (tp_res * 1) + 
+            (projet * 2) + 
+            (op1 * 1) + 
+            (op2 * 1) + 
+            (rech * 1);
+
+        let totalCoeff = 17; // 3+2 + 2+2 + 1+1+1+2 + 1+1 + 1 = 17
+
+        let average = totalScore / totalCoeff;
+
+        // --- DISPLAY ---
+        const resultPanel = document.getElementById('result');
+        const avgDisplay = document.getElementById('final_average');
+        const statusMsg = document.getElementById('status_msg');
+
+        resultPanel.style.display = 'block';
+        
+        // Count up animation
+        let currentDisplay = 0;
+        let interval = setInterval(() => {
+            if(currentDisplay >= average) {
+                currentDisplay = average;
+                clearInterval(interval);
+            } else {
+                currentDisplay += 0.1;
+            }
+            avgDisplay.innerText = currentDisplay.toFixed(2);
+            
+            // Set Color based on grade
+            if (average >= 10) {
+                avgDisplay.style.color = "#00ff6a";
+                avgDisplay.style.textShadow = "0 0 20px #00ff6a";
+                statusMsg.innerHTML = "STATUS: <span class='pass'>ADMIS (ناجح)</span>";
+            } else {
+                avgDisplay.style.color = "#ff004c";
+                avgDisplay.style.textShadow = "0 0 20px #ff004c";
+                statusMsg.innerHTML = "STATUS: <span class='fail'>AJOURNÉ (راسـب)</span>";
+            }
+        }, 10);
+    }
+</script>
+
+</body>
+</html>
